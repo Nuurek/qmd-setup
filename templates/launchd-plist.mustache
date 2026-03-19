@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.qmd.auto-embed</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>{{{home}}}/.local/bin/qmd-auto-embed.sh</string>
+  </array>
+
+  <key>WatchPaths</key>
+  <array>
+{{#watchPaths}}
+      <string>{{{.}}}</string>
+{{/watchPaths}}
+  </array>
+
+  <key>ThrottleInterval</key>
+  <integer>{{throttleInterval}}</integer>
+
+  <key>StandardOutPath</key>
+  <string>{{{home}}}/.local/log/qmd-auto-embed.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>{{{home}}}/.local/log/qmd-auto-embed.log</string>
+</dict>
+</plist>

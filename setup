@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+echo "=== qmd-setup bootstrap ==="
+echo ""
+
+# ── Find node >= 22 ──────────────────────────────────────────────────
+
+check_node() {
+  local bin="$1"
+  if [ -x "$bin" ]; then
+    local ver
+    ver=$("$bin" --version 2>/dev/null | sed 's/^v//' || echo "0")
+    local major="${ver%%.*}"
+    if [[ "$major" -ge 22 ]]; then
+      echo "$bin"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+find_node() {
+  # PATH first
+  if command -v node &>/dev/null; then
+    check_node "$(command -v node)" && return 0
+  fi
+
+  # Common locations
+  local candidates=(
+    /opt/homebrew/bin/node
+    /usr/local/bin/node
+    "$HOME/.local/share/mise/installs/node/latest/bin/node"
+    "$HOME/.asdf/shims/node"
+  )
+
+  # nvm — find latest installed version
+  if [ -d "$HOME/.nvm/versions/node" ]; then
+    local nvm_latest
+    nvm_latest=$(ls -1d "$HOME/.nvm/versions/node"/v* 2>/dev/null | sort -V | tail -1)
+    [ -n "$nvm_latest" ] && candidates+=("$nvm_latest/bin/node")
+  fi
+
+  for c in "${candidates[@]}"; do
+    check_node "$c" && return 0
+  done
+
+  return 1
+}
+
+NODE=$(find_node) || { echo "ERROR: node >= 22 not found"; exit 1; }
+echo "  node: $NODE ($($NODE --version))"
+
+# ── Find package manager ─────────────────────────────────────────────
+
+PKG_MGR=""
+if command -v bun &>/dev/null; then
+  PKG_MGR="bun"
+elif command -v npm &>/dev/null; then
+  PKG_MGR="npm"
+else
+  echo "ERROR: npm or bun required"
+  exit 1
+fi
+echo "  pkg:  $PKG_MGR"
+
+# ── Install qmd if needed ────────────────────────────────────────────
+
+if command -v qmd &>/dev/null; then
+  echo "  qmd:  $(command -v qmd)"
+else
+  echo "  Installing qmd..."
+  $PKG_MGR install -g @tobilu/qmd
+fi
+echo ""
+
+# ── Install deps + compile ────────────────────────────────────────────
+
+echo "--- Installing dependencies ---"
+cd "$REPO_DIR"
+$PKG_MGR install
+echo ""
+
+echo "--- Compiling TypeScript ---"
+npx tsc
+echo ""
+
+echo "--- Installing CLI commands ---"
+npm link
+echo ""
+
+# ── Run setup ─────────────────────────────────────────────────────────
+
+exec "$NODE" "$REPO_DIR/dist/setup.js"

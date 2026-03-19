@@ -1,0 +1,46 @@
+# qmd collection configuration
+#
+# Location: ~/.config/qmd/config.yaml  (or $XDG_CONFIG_HOME/qmd/config.yaml)
+# Override:  qmd-setup --config /path/to/config.yaml
+#
+# masks:  Named file extension profiles (combined into glob patterns)
+# collections:  Repos to index, referencing mask profiles
+#   - path: required (~ expanded to $HOME)
+#   - name: optional, defaults to basename of path
+#   - masks: list of mask profile names to combine
+
+masks:
+  docs:
+    - md
+    - sh
+  config:
+    - yaml
+    - yml
+    - json
+    - toml
+  terraform:
+    - tf
+    - tfvars
+    - hcl
+  templates:
+    - tpl
+  python:
+    - py
+  go:
+    - go
+  typescript:
+    - ts
+    - tsx
+    - js
+  data:
+    - sql
+    - graphql
+
+launchd:
+  throttle_interval: 30  # seconds between re-index triggers (default: 30)
+
+collections:
+  # Example — uncomment and adjust:
+  # - path: ~/Repositories/my-project
+  #   name: my-project
+  #   masks: [python, config, docs]
