@@ -2,7 +2,7 @@
 
 CLI tool that manages [qmd](https://github.com/tobilu/qmd) collections, launchd auto-indexing, and Claude Code integration.
 
-**Important:** After making changes, review this file and update it if your changes affect structure, commands, patterns, or conventions documented here.
+**Important:** After making changes, review and update all documentation that may be affected — this includes both this file (`CLAUDE.md`) and `README.md`.
 
 ## Quick reference
 
